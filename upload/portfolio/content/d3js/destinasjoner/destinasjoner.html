@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Mine Destinasjoner</title>
+<style>
+.country:hover{
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+.text{
+  font-size:12px;
+  text-transform:capitalize;
+}
+#container {
+  margin:10px 10%;
+  border:2px solid #000;
+  border-radius: 5px;
+  height:100%;
+  overflow:hidden;
+  background: #F0F8FF;
+}
+.hidden { 
+  display: none; 
+}
+div.tooltip {
+  color: #222; 
+  background: #fff; 
+  padding: .5em; 
+  text-shadow: #f5f5f5 0 1px 0;
+  border-radius: 2px; 
+  box-shadow: 0px 0px 2px 0px #a6a6a6; 
+  opacity: 0.9; 
+  position: absolute;
+}
+.graticule {
+  fill: none;
+  stroke: #bbb;
+  stroke-width: .5px;
+  stroke-opacity: .5;
+}
+.equator {
+  stroke: #ccc;
+  stroke-width: 1px;
+}
+.gpoint {
+  fill: red;
+}
+h1 {
+  font-family: times, Times New Roman, times-roman, georgia, serif;
+  color: black;
+  margin: 0;
+  padding: 0px 0px 6px 0px;
+  font-size: 51px;
+  line-height: 44px;
+  letter-spacing: -2px;
+  font-weight: bold;
+  text-align: center;
+}
+p {
+  display: block; 
+  text-align: center;
+  font-family: Gill Sans, Verdana;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: bold;
+  text-decoration:none;
+  color:black;
+}
+
+</style>
+</head>
+<body>
+
+  <h1>Mine destinasjoner</h1>
+
+
+  <div id="container"></div>
+
+<script src="js/d3.min.js"></script>
+<script src="js/topojson.v1.min.js"></script>
+<script>
+d3.select(window).on("resize", throttle);
+
+var zoom = d3.behavior.zoom()
+    .scaleExtent([1, 9])
+    .on("zoom", move);
+
+
+var width = document.getElementById('container').offsetWidth;
+var height = width / 2;
+
+var topo,projection,path,svg,g;
+
+// var graticule = d3.geo.graticule();
+
+var tooltip = d3.select("#container").append("div").attr("class", "tooltip hidden");
+
+setup(width,height);
+
+function setup(width,height){
+//Lager en projeksjon, slik at kartet viser det som er ønskelig.
+//NOTE: En projeksjon er nødvendig, ettersom kloden er rund og ikke 2-dimensjonal.
+//Projeksjonen er en algoritme som lar oss projektere 3-dimensjonale rom på 2-dimensjonale skjermer.
+//Tar rett og slett et koordinat og returnerer et nytt koordinat basert på ønsket projeksjon.
+  projection = d3.geo.mercator()
+  //translate setter lengde og breddegrad(0,0) til å være i senter av kartet. Det er denne x,y alle koordinater vil bygges ut ifra.
+    .translate([(width/2), (height/1.7)])
+    //scale metoden krymper ned kartet litt hvis verdien er <1000, forstørrer det hvis verdien > 1000. Er her relativ til container sin størrelse.
+    .scale( width / 2 / Math.PI);
+
+//d3.geo.path() rendrer GeoJSON-koordinatene til SVG-koordinater(path-koder)
+//Forteller også path-generatoren at den skal referere til min egne definerte projeksjon når den skal generere alle SVG-kodene.
+  path = d3.geo.path().projection(projection);
+
+//Lager root SVG-elementet
+  svg = d3.select("#container").append("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .call(zoom)
+      .on("click", click)
+      .append("g");
+//Legger til et SVG g-element(group) til root SVG-elementet. Dette g-elementet holder på hele kartet
+  g = svg.append("g");
+
+}
+
+d3.json("data/world-topo-min.json", function(error, world) {
+//Laster inn data om verden fra world-topo-min.json filen og konverterer TopoJSON-filen til GeoJSON med FeatureCollection.
+//Henter så ut features arrayet
+  var countries = topojson.feature(world, world.objects.countries).features;
+  topo = countries;
+//Tegner opp data om verden
+  draw(topo);
+
+});
+//Metode for å tegne verden og alle land.
+function draw(topo) {
+
+// //Tegner opp et rutenett(kartprojeksjon) bygd opp av breddesirkler og lengdesirkler ved å legge til et path-element med tilhørende attributter til root SVG-elementet
+//   svg.append("path")
+//      .datum(graticule)
+//      .attr("class", "graticule")
+// //Gir path d(data)-attributtet SVG-koden fra d3.geo.path(path-generatoren), som nevnt konverterer GeoJSON koordinater til SVG-kode
+//      .attr("d", path);
+
+//Tegner ekvator på kartet
+  // g.append("path")
+  //  .datum({type: "LineString", coordinates: [[-180, 0], [-90, 0], [0, 0], [90, 0], [180, 0]]})
+  //  .attr("class", "equator")
+  //  .attr("d", path);
+
+//Lager et SVG g-element(group) for hvert element i topo, som er et array bestående av alle land
+  var country = g.selectAll(".country").data(topo);
+
+//Setter inn et path-element med flere attributter for det aktuelle landet.
+  country.enter().insert("path")
+      .attr("class", "country")
+      .attr("d", path)
+      .attr("id", function(d,i) { return d.id; })
+      .attr("title", function(d,i) { return d.properties.name; })
+      .style("fill", function(d, i) { return d.properties.color; });
+
+  //Koordinater for tooltip
+  var offsetL = document.getElementById('container').offsetLeft+20;
+  var offsetT = document.getElementById('container').offsetTop+10;
+
+  //Event for å få frem og skjule tooltipet
+  country
+    .on("mousemove", function(d,i) {
+
+      var mouse = d3.mouse(svg.node()).map( function(d) { return parseInt(d); } );
+
+      tooltip.classed("hidden", false)
+             .attr("style", "left:"+(mouse[0]+offsetL)+"px;top:"+(mouse[1]+offsetT)+"px")
+             .html(d.properties.name);
+
+      })
+      .on("mouseout",  function(d,i) {
+        tooltip.classed("hidden", true);
+      }); 
+
+
+  //Legger til steder fra punkter.csv-filen som punkter med addpoint-metoden
+  d3.csv("data/destinasjoner.csv", function(err, capitals) {
+
+    capitals.forEach(function(i){
+      addpoint(i.CapitalLongitude, i.CapitalLatitude, i.CapitalName);
+    });
+
+  });
+
+}
+
+//Metode for å tegne kartet på nytt, slik at det skalerer bra til alle bredde*høyder og hvis man endrer zoom-nivået i nettleseren
+function redraw() {
+  width = document.getElementById('container').offsetWidth;
+  height = width / 2;
+  d3.select('svg').remove();
+  setup(width,height);
+  draw(topo);
+}
+
+//Metode for å zoome inn og ut på kartet
+function move() {
+
+  var t = d3.event.translate;
+  var s = d3.event.scale; 
+  zscale = s;
+  var h = height/4;
+
+
+  t[0] = Math.min(
+    (width/height)  * (s - 1), 
+    Math.max( width * (1 - s), t[0] )
+  );
+
+  t[1] = Math.min(
+    h * (s - 1) + h * s, 
+    Math.max(height  * (1 - s) - h * s, t[1])
+  );
+
+  zoom.translate(t);
+  g.attr("transform", "translate(" + t + ")scale(" + s + ")");
+
+  //Endrer landets stroke-width basert på zoom-nivået
+  d3.selectAll(".country").style("stroke-width", 1.5 / s);
+  d3.selectAll(".gpoint").attr("r", 5 / s);
+  d3.selectAll(".text").style("font-size", function(){
+  	var verdi=Math.round(12/ s);
+  	if(verdi<3){
+  		return 3 + "px";
+  	}
+  	else{
+  		return verdi + "px";
+  	}
+  });
+}
+
+
+
+var throttleTimer;
+//Metode for å skalere(redraw) kartet, i løpet av 200ms
+function throttle() {
+  window.clearTimeout(throttleTimer);
+    throttleTimer = window.setTimeout(function() {
+      redraw();
+    }, 200);
+}
+
+
+//Skriver til consolen ved hvert klikk, for å se latitude(breddegrad) og longitude(lengdegrad)
+function click() {
+  var latlon = projection.invert(d3.mouse(this));
+  console.log(latlon);
+}
+
+//Metode for å legge til eksterne punkter og tekst til kartet. 
+function addpoint(lat,lon,text) {
+
+  var gpoint = g.append("g")
+  .attr("class", "point")
+  .on("click", function(){
+console.log(this);
+});
+  var x = projection([lat,lon])[0];
+  var y = projection([lat,lon])[1];
+
+  gpoint.append("svg:circle")
+        .attr("cx", x)
+        .attr("cy", y)
+        .attr("class","gpoint")
+        .attr("r", 5);
+
+  //Legger til tekst kun hvis punktet har tekst
+  if(text.length>0){
+
+    gpoint.append("text")
+          .attr("x", x+2)
+          .attr("y", y+2)
+          .attr("class","text")
+          .text(text);
+  }
+}
+
+
+
+</script>
+<p>Utviklet med <a href="http://d3js.org" target="_blank">D3.js</a> og inspirert av eksempel fra <a href="http://techslides.com/d3-map-starter-kit/" target="_blank">TechSlides.com</a></p>
+</body>
+</html>

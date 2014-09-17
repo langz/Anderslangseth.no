@@ -1,0 +1,38 @@
+CountryName,CapitalName,CapitalLatitude,CapitalLongitude,CountryCode,ContinentName
+Austria,Wien,48.2206849,16.3800599,AT,Europe
+Denmark,Copenhagen,55.6712674,12.5608388,DK,Europe
+Denmark,Skagen,57.6658175,10.2336638,DK,Europe
+Finland,Helsinki,60.1733239,24.9410248,FI,Europe
+France,Paris,48.8588589,2.3470599,FR,Europe
+Germany,Berlin,52.5075419,13.4261419,DE,Europe
+Greece,Crete,35.2483132,24.9131999,GR,Europe
+Greece,Rhodos,36.1676631,27.9655113,GR,Europe
+Greece,Santorini,36.4071538,25.4206309,GR,Europe
+Hungary,Budapest,47.4812134,19.1303031,HU,Europe
+Italy,Sicilia,37.472863,14.0383991,IT,Europe
+Netherlands,Amsterdam,52.3747158,4.8986166,NL,Europe
+Norway,Bardufoss,69.0644444,18.515,NO,Europe
+Norway,Bergen,60.3651901,5.4291772,NO,Europe
+Norway,Galdhøpiggen,61.640662,8.309097,NO,Europe
+Norway,Kr.sand,58.1529776,8.0092118,NO,Europe
+Norway,Lillehammer,61.1122453,10.4737829,NO,Europe
+Norway,Molde,62.7447162,7.1612695,NO,Europe
+Norway,Narvik,68.4353244,17.4223345,NO,Europe
+Norway,Oslo,59.8938549,10.7851166,NO,Europe
+Norway,Stavanger,58.948354,5.6800225,NO,Europe
+Norway,Tromsø,69.6652277,18.9905429,NO,Europe
+Norway,Trondheim,63.4187362,10.4387621,NO,Europe
+Poland,Auschwitz,50.0351136,19.2582577,PL,Europe
+Poland,Warszawa,52.232938,21.0611941,PL,Europe
+Spain,Alacant,38.3578408,-0.4725242,ES,Europe
+Spain,Barcelona,41.39479,2.1487679,ES,Europe
+Spain,Málaga,36.718222,-4.4492669,ES,Europe
+Spain,Mallorca,39.613498,2.911652,ES,Europe
+Spain,Menorca,39.949258,4.0592852,ES,Europe
+Sweden,Gothenburg,57.7019548,11.8936825,SE,Europe
+Sweden,Sälen,60.6056615,15.8107295,SE,Europe
+Tunisia,Al Munastîr,35.767609,10.8137678,TN,North Africa
+United Kingdom,Edinburgh,55.9410655,-3.2053836,GB,Europe
+United Kingdom,Liverpool,53.4200911,-2.9108429,GB,Europe
+United Kingdom,London,51.5286416,-0.1015987,GB,Europe
+United States,New York,40.7056308,-73.9780035,US,Central America

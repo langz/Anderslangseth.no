@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js?1.29.5"></script>
+    <script type="text/javascript" src="http://polymaps.org/polymaps.min.js?2.5.0"></script>
+    <style type="text/css">
+
+@import url("http://polymaps.org/style.css");
+
+html, body {
+  height: 100%;
+  background: #E6E6E6;
+  margin: 0;
+  font: 10px sans-serif;
+}
+
+svg {
+  display: block;
+}
+
+circle {
+  stroke: black;
+  fill: brown;
+  fill-opacity: .5;
+}
+
+#map {
+  width: 960px;
+  height: 500px;
+}
+
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script type="text/javascript">
+
+var po = org.polymaps;
+
+// Create the map object, add it to #map…
+var map = po.map()
+    .container(d3.select("#map").append("svg:svg").node())
+    .zoom(8)
+    .add(po.interact());
+
+// Add the CloudMade image tiles as a base layer…
+map.add(po.image()
+    .url(po.url("http://{S}tile.cloudmade.com"
+    + "/1a1b06b230af4efdbb989ea99e9841af" // http://cloudmade.com/register
+    + "/998/256/{Z}/{X}/{Y}.png")
+    .hosts(["a.", "b.", "c.", ""])));
+
+// Add the compass control on top.
+map.add(po.compass()
+    .pan("none"));
+
+// Load the station data. When the data comes back, display it.
+var layer = po.geoJson();
+var featAtoB = {type: "Feature", geometry: {type: "LineString", 
+               coordinates: [[-120,36], [-128,37]]},
+               properties: {prop0: "value0",prop1: 0.0}};
+layer.features([featAtoB]);
+
+map.add(layer);
+
+
+    </script>
+  </body>
+</html>
